@@ -45,7 +45,7 @@ class SearchTest(unittest.TestCase):
                 cnt+=1
                     
             else:    
-                sline = line.strip().split(';')
+                sline = line.strip().split(';')#строка конвертируется в список по символу-разделителю
                 self.browser.get('%ssearch/?q=%s' %(self.HOST, sline[0]))
 
                 try:
