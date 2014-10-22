@@ -11,7 +11,7 @@ class SearchTest(unittest.TestCase):
         
     def setUp(self):
         """Инициализация переменных для всех тестов"""
-        self.TEXT_FILE = open('search_words', 'r')
+        self.TEXT_FILE = open('%s/search_words.txt' % os.getenv('WORKSPACE'), 'r')
         self.HOST = 'http://%s.%s/' % (os.getenv('CITY'), os.getenv('HOST'))
         self.browser = webdriver.Firefox()
         
@@ -32,8 +32,8 @@ class SearchTest(unittest.TestCase):
 
        
         line_cnt=0 #счетчик строк теста
-        if os.path.getsize('%s/search_words' % os.getenv('WORKSPACE'))==0: #проверка на то, что файл не пустой
-            raise Exception('\nSearching file is empty\nAre you sure it`s been upload')
+        if os.path.getsize('%s/search_words.txt' % os.getenv('WORKSPACE'))==0: #проверка на то, что файл не пустой
+            raise Exception('\nSearching file is empty')
             
         for line in self.TEXT_FILE:
                 
@@ -86,7 +86,8 @@ class SearchTest(unittest.TestCase):
                         print 'Номер строки: %s' % line_cnt
                         print '-'*80
                         cnt+=1
-             
+
+        print 'Строк проверено - %s' % line_cnt 
                                            
         assert cnt==0, (u'Errors found: %d')%(cnt)
         
