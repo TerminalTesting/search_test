@@ -14,6 +14,7 @@ class SearchTest(unittest.TestCase):
         self.TEXT_FILE = open('%s/search_words.csv' % os.getenv('WORKSPACE'), 'r')
         self.HOST = 'http://%s.%s/' % (os.getenv('CITY'), os.getenv('HOST'))
         self.browser = webdriver.Firefox()
+        self.ARTSOURCE = '%sartifact/' % os.getenv('BUILD_URL')
         
 
     def tearDown(self):
@@ -23,13 +24,50 @@ class SearchTest(unittest.TestCase):
         if sys.exc_info()[0]:   
             print sys.exc_info()[0]
 
+    def is_element_present(self, how, what, timeout=10):
+        """ Поиск элемента по локатору
 
-    
+            По умолчанию таймаут 10 секунд, не влияет на скорость выполнения теста
+            если элемент найден, если нет - ждет его появления 10 сек
+            
+            Параметры:
+               how - метод поиска
+               what - локатор
+            Методы - атрибуты класса By:
+             |  CLASS_NAME = 'class name'
+             |  
+             |  CSS_SELECTOR = 'css selector'
+             |  
+             |  ID = 'id'
+             |  
+             |  LINK_TEXT = 'link text'
+             |  
+             |  NAME = 'name'
+             |  
+             |  PARTIAL_LINK_TEXT = 'partial link text'
+             |  
+             |  TAG_NAME = 'tag name'
+             |  
+             |  XPATH = 'xpath'
+                                             """
+	try:
+            return WebDriverWait(self.browser, timeout).until(EC.presence_of_element_located((how, what)))
+	except:
+            print u'Элемент не найден'
+	    print 'URL: ', self.browser.current_url
+	    print u'Метод поиска: ', how
+	    print u'Локатор: ', what
+	    screen_name = '%d.png' % int(time.time())
+	    self.browser.get_screenshot_as_file(screen_name)
+	    print u'Скриншот страницы: ', self.ARTSOURCE + screen_name
+	    raise Exception('ElementNotPresent')
+
+
 
     def test_search(self):
 
         cnt=0 #счетчик ошибок теста
-
+        element = self.is_element_present
        
         line_cnt=0 #счетчик строк теста
         if os.path.getsize('%s/search_words.csv' % os.getenv('WORKSPACE'))==0: #проверка на то, что файл не пустой
@@ -49,8 +87,8 @@ class SearchTest(unittest.TestCase):
                 self.browser.get('%ssearch/?q=%s' %(self.HOST, sline[0]))
 
                 try:
-                    search_title = self.browser.find_element_by_class_name('componentHeader').text
-                    search_field = self.browser.find_element_by_class_name('search-string').get_attribute('value')
+                    search_title = element(By.CLASS_NAME, 'componentHeader').text
+                    search_field = element(By.CLASS_NAME, 'search-string').get_attribute('value')
 
                 except NoSuchElementException: #элементы на странице не найдены, соответственно либо страница вернулась с ошибкой, либо не правильный урл
                     cnt+=1
@@ -86,8 +124,9 @@ class SearchTest(unittest.TestCase):
                         print 'Номер строки: %s' % line_cnt
                         print '-'*80
                         cnt+=1
-
-        print 'Строк проверено - %s' % line_cnt 
+        print '-'*29
+        print '|   Строк проверено - %s   |' % line_cnt
+        print '-'*29
                                            
         assert cnt==0, (u'Errors found: %d')%(cnt)
         
