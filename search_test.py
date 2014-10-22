@@ -11,7 +11,7 @@ class SearchTest(unittest.TestCase):
         
     def setUp(self):
         """Инициализация переменных для всех тестов"""
-        self.TEXT_FILE = open('%s/search_words.txt' % os.getenv('WORKSPACE'), 'r')
+        self.TEXT_FILE = open('%s/search_words.csv' % os.getenv('WORKSPACE'), 'r')
         self.HOST = 'http://%s.%s/' % (os.getenv('CITY'), os.getenv('HOST'))
         self.browser = webdriver.Firefox()
         
@@ -32,7 +32,7 @@ class SearchTest(unittest.TestCase):
 
        
         line_cnt=0 #счетчик строк теста
-        if os.path.getsize('%s/search_words.txt' % os.getenv('WORKSPACE'))==0: #проверка на то, что файл не пустой
+        if os.path.getsize('%s/search_words.csv' % os.getenv('WORKSPACE'))==0: #проверка на то, что файл не пустой
             raise Exception('\nSearching file is empty')
             
         for line in self.TEXT_FILE:
